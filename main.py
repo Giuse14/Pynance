@@ -1,8 +1,8 @@
 from data_loader import load_data
-from portfolio_analysis import analyze_portfolio
+from portfolio_analysis import analyze_portfolio, generate_analysis_report
 from prediction import train_model, forecast
 from simulation import run_scenario
-from visualisation import plot_prices, plot_prediction, plot_scenario
+from visualisation import plot_prices, plot_prediction, plot_scenario, plot_portfolio_analysis, plot_returns_over_time, plot_drawdown
 from get_user_portfolio import get_user_portfolio
 from portfolio_builder import build_portfolio_series
 from gui_portfolio_selector import select_portfolio_gui
@@ -18,46 +18,108 @@ def main():
     y_test = None
     pred = None
     scenario = None
+    current_period = "10y"  # Default period
 
     while True:
         print("\n========== PORTFOLIO MANAGER ==========")
         print("1) Load portfolio & market data")
-        print("2) Analyze portfolio")
-        print("3) Train & Forecast model")
-        print("4) Forecast future prices")
-        print("5) Plot price history")
-        print("6) Exit")
+        print("2) Analyze portfolio (Text Report)")
+        print("3) Visualize portfolio analysis")
+        print("4) Plot returns over time")
+        print("5) Plot drawdown analysis")
+        print("6) Train & Forecast model")
+        print("7) Run scenario analysis")
+        print("8) Plot price history")
+        print("9) Exit")
         print("========================================")
 
-        choice = input("Choose an option (1-6): ").strip()
+        choice = input("Choose an option (1-9): ").strip()
 
         # --------------------------------------------------------
         # 1) Load portfolio
         # --------------------------------------------------------
         if choice == "1":
-            # tickers, weights = get_user_portfolio()
             tickers, weights = select_portfolio_gui()
-            data = load_data(tickers, period="2y")
+            data = load_data(tickers, period=current_period)
             portfolio_series = build_portfolio_series(data, tickers, weights)
-            # print("\nPortfolio loaded successfully!")
-            print("\nPortfolio successfully loaded:", tickers)
+            print(f"\nPortfolio successfully loaded: {tickers}")
+            print(f"Data period: {current_period}")
 
         # --------------------------------------------------------
-        # 2) Analyze portfolio
+        # 2) Analyze portfolio (Text Report)
         # --------------------------------------------------------
         elif choice == "2":
-            if portfolio_series is None:
+            if portfolio_series is None or data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
 
-            print("\nPortfolio Analysis:")
-            print("Mean return:", portfolio_series.pct_change().mean())
-            print("Volatility:", portfolio_series.pct_change().std())
+            # Allow user to select analysis period
+            print("\nSelect analysis period:")
+            print("1) 5 years (5y)")
+            print("2) 10 years (10y) - Recommended")
+            print("3) 15 years (15y)")
+            print("4) Maximum available (max)")
+            print("5) Keep current period")
+            
+            period_choice = input("Choose period (1-5): ").strip()
+            period_map = {
+                "1": "5y",
+                "2": "10y", 
+                "3": "15y",
+                "4": "max",
+                "5": current_period
+            }
+            
+            if period_choice in period_map:
+                selected_period = period_map[period_choice]
+                if selected_period != current_period:
+                    print(f"Loading data for {selected_period} period...")
+                    data = load_data(tickers, period=selected_period)
+                    portfolio_series = build_portfolio_series(data, tickers, weights)
+                    current_period = selected_period
+            else:
+                print("Invalid choice, using current period.")
+
+            print(f"\nRunning comprehensive portfolio analysis ({current_period})...")
+            analysis = analyze_portfolio(data, weights)
+            report = generate_analysis_report(analysis, tickers, weights)
+            print(report)
 
         # --------------------------------------------------------
-        # 3) Train & Forecast model 
+        # 3) Visualize portfolio analysis
         # --------------------------------------------------------
         elif choice == "3":
+            if data is None:
+                print("Error: Load portfolio first (option 1).")
+                continue
+
+            analysis = analyze_portfolio(data, weights)
+            plot_portfolio_analysis(analysis, tickers, weights)
+
+        # --------------------------------------------------------
+        # 4) Plot returns over time
+        # --------------------------------------------------------
+        elif choice == "4":
+            if data is None:
+                print("Error: Load portfolio first (option 1).")
+                continue
+
+            plot_returns_over_time(data, weights)
+
+        # --------------------------------------------------------
+        # 5) Plot drawdown analysis
+        # --------------------------------------------------------
+        elif choice == "5":
+            if data is None:
+                print("Error: Load portfolio first (option 1).")
+                continue
+
+            plot_drawdown(data, weights)
+
+        # --------------------------------------------------------
+        # 6) Train & Forecast model 
+        # --------------------------------------------------------
+        elif choice == "6":
             if portfolio_series is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
@@ -67,9 +129,9 @@ def main():
             plot_prediction(y_test, pred)
 
         # --------------------------------------------------------
-        # 4) Run scenario
+        # 7) Run scenario
         # --------------------------------------------------------
-        elif choice == "4":
+        elif choice == "7":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
@@ -90,9 +152,9 @@ def main():
             plot_scenario(scenario)
 
         # --------------------------------------------------------
-        # 5) Plot historical prices
+        # 8) Plot historical prices
         # --------------------------------------------------------
-        elif choice == "5":
+        elif choice == "8":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
@@ -100,14 +162,14 @@ def main():
             plot_prices(data)
 
         # --------------------------------------------------------
-        # 6) Exit
+        # 9) Exit
         # --------------------------------------------------------
-        elif choice == "6":
+        elif choice == "9":
             print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please select a number between 1 and 6.")
+            print("Invalid choice. Please select a number between 1 and 9.")
 
 
 if __name__ == "__main__":
