@@ -1,0 +1,7 @@
+Stuff to improve:
+
+- Monte Carlo simulations for portfolio projections
+- Option pricing and Derivatives (may be interesting to add and see what would happen)
+- Wenn mir Zit hend:
+	-> Erstellen vom Portfolio, der am meiste Rendite erzielt
+	-> Erstellen vom Portfolio, der am stabilsten geblieben ist
