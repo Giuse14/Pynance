@@ -5,6 +5,7 @@ from simulation import run_scenario
 from visualisation import plot_prices, plot_prediction, plot_scenario
 from get_user_portfolio import get_user_portfolio
 from portfolio_builder import build_portfolio_series
+from gui_portfolio_selector import select_portfolio_gui
 
 
 def main():
@@ -34,10 +35,12 @@ def main():
         # 1) Load portfolio
         # --------------------------------------------------------
         if choice == "1":
-            tickers, weights = get_user_portfolio()
+            # tickers, weights = get_user_portfolio()
+            tickers, weights = select_portfolio_gui()
             data = load_data(tickers, period="2y")
             portfolio_series = build_portfolio_series(data, tickers, weights)
-            print("\nPortfolio & market data loaded successfully!")
+            # print("\nPortfolio loaded successfully!")
+            print("\nPortfolio successfully loaded:", tickers)
 
         # --------------------------------------------------------
         # 2) Analyze portfolio
