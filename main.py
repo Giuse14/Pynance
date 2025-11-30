@@ -1,6 +1,6 @@
 from data_loader import load_data
 from portfolio_analysis import analyze_portfolio, generate_analysis_report
-from prediction import train_model, forecast
+from prediction import train_model, forecast_future_days, plot_with_predictions
 from simulation import run_scenario
 from visualisation import plot_prices, plot_prediction, plot_scenario, plot_portfolio_analysis, plot_returns_over_time, plot_drawdown
 from get_user_portfolio import get_user_portfolio
@@ -117,16 +117,31 @@ def main():
             plot_drawdown(data, weights)
 
         # --------------------------------------------------------
-        # 6) Train & Forecast model 
+        # 6) Train & Forecast model  (NEUE VERSION)
         # --------------------------------------------------------
         elif choice == "6":
             if portfolio_series is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
 
+            # Modell trainieren (aus neuer prediction.py)
             model, X_test, y_test = train_model(portfolio_series)
-            pred = forecast(model, X_test)
-            plot_prediction(y_test, pred)
+
+            # Benutzer nach Prognosezeitraum fragen
+            try:
+                years_to_predict = int(input("Wie viele Jahre sollen prognostiziert werden? "))
+                if years_to_predict <= 0:
+                    print("Please enter a positive number.")
+                    continue
+            except ValueError:
+                print("Invalid input. Please enter a positive integer.")
+                continue
+
+            # Zukunft prognostizieren
+            future_predictions = forecast_future_days(model, portfolio_series, years_to_predict)
+
+            # Neues Plot mit Jahresachse + Zukunft aus prediction.py
+            plot_with_predictions(portfolio_series, future_predictions, years_to_predict)
 
         # --------------------------------------------------------
         # 7) Run scenario
