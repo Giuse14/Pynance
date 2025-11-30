@@ -209,6 +209,27 @@ def generate_analysis_report(analysis_results, tickers, weights):
                      f"Return: {analysis_results['components']['Individual Returns'][ticker]:.2%} | "
                      f"Vol: {analysis_results['components']['Individual Volatilities'][ticker]:.2%}")
     
+    ###### CSV EXPORT
+
+    csv_rows = []
+    individual_returns = analysis_results['components']['Individual Returns']
+    individual_vols = analysis_results['components']['Individual Volatilities']
+    weight_contrib = analysis_results['components']['Weight Contribution']
+    risk_contrib = analysis_results['components']['Risk Contribution']
+
+    for i, ticker in enumerate(tickers):
+        csv_rows.append({
+            "Wertpapier": ticker,
+            "Gewichtung": weights[i],
+            "Annualisierte Rendite": individual_returns[ticker],
+            "Annualisierte Volatilität": individual_vols[ticker],
+            "Renditebeitrag": weight_contrib[i],
+            "Risikobeitrag": risk_contrib[i]
+        })
+
+    df_export = pd.DataFrame(csv_rows)
+    df_export.to_csv("portfolio_analyse_zusammenfassung.csv", index=False)
+    
     return "\n".join(report)
 
 def plot_asset_allocation(analysis_results, tickers, weights):
