@@ -6,6 +6,10 @@ from visualisation import plot_prediction, plot_scenario, plot_portfolio_analysi
 from get_user_portfolio import get_user_portfolio
 from portfolio_builder import build_portfolio_series
 from gui_portfolio_selector import select_portfolio_gui
+from montecarlo import run_monte_carlo_simulation
+
+import pandas as pd
+
 
 
 def main():
@@ -27,12 +31,13 @@ def main():
         print("3) Visualize portfolio analysis")
         print("4) Plot drawdown analysis")
         print("5) Train & Forecast model")
-        print("6) Run scenario analysis")
-        print("7) Plot price history")
-        print("8) Exit")
+        print("6) Monte Carlo Simulation")
+        print("7) Run scenario analysis")
+        print("8) Plot price history")
+        print("9) Exit")
         print("========================================")
 
-        choice = input("Choose an option (1-8): ").strip()
+        choice = input("Choose an option (1-9): ").strip()
 
         # --------------------------------------------------------
         # 1) Load portfolio
@@ -140,6 +145,22 @@ def main():
                 print("Error: Load portfolio first (option 1).")
                 continue
 
+            # Build price DataFrame for MC
+            price_df = pd.concat([data[t]["Close"] for t in tickers], axis=1)
+            price_df.columns = tickers
+
+            run_monte_carlo_simulation(price_df, weights)
+            
+
+
+        # --------------------------------------------------------
+        # 7) Run scenario
+        # --------------------------------------------------------
+        elif choice == "7":
+            if data is None:
+                print("Error: Load portfolio first (option 1).")
+                continue
+
             print("\nChoose scenario:")
             print("1) AI Bubble (+15%)")
             print("2) Crash (-15%)")
@@ -156,15 +177,9 @@ def main():
             plot_scenario(scenario)
 
         # --------------------------------------------------------
-        # 7) Plot historical prices
+        # 8) Plot historical prices
         # --------------------------------------------------------
-        # elif choice == "7":
-        #     if data is None:
-        #         print("Error: Load portfolio first (option 1).")
-        #         continue
-
-        #     plot_prices(data)
-        elif choice == "7":
+        elif choice == "8":
             if data is None:
                 print("Load portfolio first.")
                 continue
@@ -172,14 +187,14 @@ def main():
 
 
         # --------------------------------------------------------
-        # 8) Exit
+        # 9) Exit
         # --------------------------------------------------------
-        elif choice == "8":
+        elif choice == "9":
             print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please select a number between 1 and 8.")
+            print("Invalid choice. Please select a number between 1 and 9.")
 
 
 if __name__ == "__main__":
