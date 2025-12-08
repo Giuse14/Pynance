@@ -3,18 +3,18 @@ import numpy as np
 import pandas as pd
 from matplotlib.gridspec import GridSpec
 
-def plot_prices(data):
-    """Zeigt Kursverläufe aller Aktien."""
-    plt.figure(figsize=(12, 6))
-    for t, df in data.items():
-        plt.plot(df["Close"], label=t)
-    plt.legend()
-    plt.title("Historische Kurse")
-    plt.xlabel("Datum")
-    plt.ylabel("Preis ($)")
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.show()
+# def plot_prices(data):
+#     """Zeigt Kursverläufe aller Aktien."""
+#     plt.figure(figsize=(12, 6))
+#     for t, df in data.items():
+#         plt.plot(df["Close"], label=t)
+#     plt.legend()
+#     plt.title("Historische Kurse")
+#     plt.xlabel("Datum")
+#     plt.ylabel("Preis ($)")
+#     plt.grid(True, alpha=0.3)
+#     plt.tight_layout()
+#     plt.show()
 
 def plot_prediction(y_test, pred):
     """Zeigt echte vs vorhergesagte Preise."""
@@ -193,38 +193,38 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     plt.tight_layout()
     plt.show()
 
-def plot_returns_over_time(data, weights):
-    """Plot cumulative returns over time for portfolio and individual assets"""
-    plt.figure(figsize=(12, 8))
+# def plot_returns_over_time(data, weights):
+#     """Plot cumulative returns over time for portfolio and individual assets"""
+#     plt.figure(figsize=(12, 8))
     
-    # Calculate cumulative returns for each asset
-    for ticker, df in data.items():
-        returns = df['Close'].pct_change().dropna()
-        cumulative_returns = (1 + returns).cumprod() - 1
-        plt.plot(cumulative_returns.index, cumulative_returns.values, 
-                label=ticker, alpha=0.7)
+#     # Calculate cumulative returns for each asset
+#     for ticker, df in data.items():
+#         returns = df['Close'].pct_change().dropna()
+#         cumulative_returns = (1 + returns).cumprod() - 1
+#         plt.plot(cumulative_returns.index, cumulative_returns.values, 
+#                 label=ticker, alpha=0.7)
     
-    # Calculate portfolio cumulative returns
-    all_returns = []
-    for df in data.values():
-        ret = df["Close"].pct_change().dropna()
-        all_returns.append(ret)
+#     # Calculate portfolio cumulative returns
+#     all_returns = []
+#     for df in data.values():
+#         ret = df["Close"].pct_change().dropna()
+#         all_returns.append(ret)
     
-    returns_df = pd.concat(all_returns, axis=1)
-    returns_df.columns = data.keys()
-    portfolio_returns = returns_df.dot(weights)
-    portfolio_cumulative = (1 + portfolio_returns).cumprod() - 1
+#     returns_df = pd.concat(all_returns, axis=1)
+#     returns_df.columns = data.keys()
+#     portfolio_returns = returns_df.dot(weights)
+#     portfolio_cumulative = (1 + portfolio_returns).cumprod() - 1
     
-    plt.plot(portfolio_cumulative.index, portfolio_cumulative.values, 
-            label='Portfolio', linewidth=3, color='black')
+#     plt.plot(portfolio_cumulative.index, portfolio_cumulative.values, 
+#             label='Portfolio', linewidth=3, color='black')
     
-    plt.title('Cumulative Returns Over Time', fontweight='bold')
-    plt.xlabel('Date')
-    plt.ylabel('Cumulative Return')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.show()
+#     plt.title('Cumulative Returns Over Time', fontweight='bold')
+#     plt.xlabel('Date')
+#     plt.ylabel('Cumulative Return')
+#     plt.legend()
+#     plt.grid(True, alpha=0.3)
+#     plt.tight_layout()
+#     plt.show()
 
 def plot_drawdown(data, weights):
     """Plot portfolio drawdown over time"""
@@ -252,4 +252,107 @@ def plot_drawdown(data, weights):
     plt.ylabel('Drawdown')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
+    plt.show()
+
+def interactive_toggle_plot(data, weights=None):
+    """Interactive toggle between PRICE mode and RETURN mode.
+       FIXED: Portfolio PRICE is shown in price mode (non-normalized).
+    """
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    mode = "price"
+
+    # Build DataFrame of asset prices
+    price_df = pd.concat([df["Close"] for df in data.values()], axis=1)
+    price_df.columns = data.keys()
+
+    # Daily returns
+    returns_df = price_df.pct_change().dropna()
+
+    # --- PORTFOLIO PRICE (REAL, NOT NORMALIZED) ---
+    if weights is not None:
+        weights = np.array(weights)
+
+        # Weighted portfolio value:
+        # portfolio_price[t] = sum_i( weight_i * price_i[t] )
+        portfolio_price = price_df.mul(weights, axis=1).sum(axis=1)
+
+        # Portfolio returns (needed only for the return plot)
+        portfolio_returns = returns_df.dot(weights)
+
+    # ------------------------------------------------------------
+    # PRICE PLOT (real prices, non-normalized)
+    # ------------------------------------------------------------
+    def plot_price():
+        ax.clear()
+
+        # Plot asset prices
+        for ticker in price_df.columns:
+            ax.plot(price_df.index, price_df[ticker], label=ticker)
+
+        # Plot real portfolio price
+        if weights is not None:
+            ax.plot(portfolio_price.index,
+                    portfolio_price.values,
+                    label="Portfolio",
+                    color="black",
+                    linewidth=3)
+
+        ax.set_title("Historical Prices (Real, Not Normalized)")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Price [$]")
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+        fig.canvas.draw_idle()
+
+    # ------------------------------------------------------------
+    # RETURN PLOT (cumulative returns)
+    # ------------------------------------------------------------
+    def plot_return():
+        ax.clear()
+
+        # Plot each asset's cumulative return
+        for ticker in returns_df.columns:
+            cum = (1 + returns_df[ticker]).cumprod() - 1
+            ax.plot(cum.index, cum.values, label=ticker)
+
+        # Plot portfolio cumulative returns
+        if weights is not None:
+            cum_port = (1 + portfolio_returns).cumprod() - 1
+            ax.plot(cum_port.index,
+                    cum_port.values,
+                    label="Portfolio",
+                    color="black",
+                    linewidth=3)
+
+        ax.set_title("Cumulative Returns Over Time")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Cumulative Return [%]")
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+        fig.canvas.draw_idle()
+
+    # ------------------------------------------------------------
+    # INITIAL PLOT
+    # ------------------------------------------------------------
+    plot_price()
+
+    # ------------------------------------------------------------
+    # KEYBOARD EVENT
+    # ------------------------------------------------------------
+    def on_key(event):
+        nonlocal mode
+        if event.key == "h":
+            mode = "price"
+            plot_price()
+        elif event.key == "r":
+            mode = "return"
+            plot_return()
+
+    fig.canvas.mpl_connect("key_press_event", on_key)
+
+    print("\nInteractive Plot Controls:")
+    print("Press 'h' → Historical Prices (REAL)")
+    print("Press 'r' → Cumulative Returns")
+
     plt.show()

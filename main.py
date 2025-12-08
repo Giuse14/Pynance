@@ -2,7 +2,7 @@ from data_loader import load_data
 from portfolio_analysis import analyze_portfolio, generate_analysis_report
 from prediction import train_model, forecast_future_days, plot_with_predictions
 from simulation import run_scenario
-from visualisation import plot_prices, plot_prediction, plot_scenario, plot_portfolio_analysis, plot_returns_over_time, plot_drawdown
+from visualisation import plot_prediction, plot_scenario, plot_portfolio_analysis, plot_drawdown, interactive_toggle_plot
 from get_user_portfolio import get_user_portfolio
 from portfolio_builder import build_portfolio_series
 from gui_portfolio_selector import select_portfolio_gui
@@ -25,15 +25,14 @@ def main():
         print("1) Load portfolio & market data")
         print("2) Analyze portfolio (Text Report)")
         print("3) Visualize portfolio analysis")
-        print("4) Plot returns over time")
-        print("5) Plot drawdown analysis")
-        print("6) Train & Forecast model")
-        print("7) Run scenario analysis")
-        print("8) Plot price history")
-        print("9) Exit")
+        print("4) Plot drawdown analysis")
+        print("5) Train & Forecast model")
+        print("6) Run scenario analysis")
+        print("7) Plot price history")
+        print("8) Exit")
         print("========================================")
 
-        choice = input("Choose an option (1-9): ").strip()
+        choice = input("Choose an option (1-8): ").strip()
 
         # --------------------------------------------------------
         # 1) Load portfolio
@@ -97,19 +96,9 @@ def main():
             plot_portfolio_analysis(analysis, tickers, weights)
 
         # --------------------------------------------------------
-        # 4) Plot returns over time
+        # 4) Plot drawdown analysis
         # --------------------------------------------------------
         elif choice == "4":
-            if data is None:
-                print("Error: Load portfolio first (option 1).")
-                continue
-
-            plot_returns_over_time(data, weights)
-
-        # --------------------------------------------------------
-        # 5) Plot drawdown analysis
-        # --------------------------------------------------------
-        elif choice == "5":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
@@ -117,9 +106,9 @@ def main():
             plot_drawdown(data, weights)
 
         # --------------------------------------------------------
-        # 6) Train & Forecast model  (NEUE VERSION)
+        # 5) Train & Forecast model  (NEUE VERSION)
         # --------------------------------------------------------
-        elif choice == "6":
+        elif choice == "5":
             if portfolio_series is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
@@ -144,9 +133,9 @@ def main():
             plot_with_predictions(portfolio_series, future_predictions, years_to_predict)
 
         # --------------------------------------------------------
-        # 7) Run scenario
+        # 6) Run scenario
         # --------------------------------------------------------
-        elif choice == "7":
+        elif choice == "6":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
@@ -167,24 +156,30 @@ def main():
             plot_scenario(scenario)
 
         # --------------------------------------------------------
-        # 8) Plot historical prices
+        # 7) Plot historical prices
+        # --------------------------------------------------------
+        # elif choice == "7":
+        #     if data is None:
+        #         print("Error: Load portfolio first (option 1).")
+        #         continue
+
+        #     plot_prices(data)
+        elif choice == "7":
+            if data is None:
+                print("Load portfolio first.")
+                continue
+            interactive_toggle_plot(data, weights)
+
+
+        # --------------------------------------------------------
+        # 8) Exit
         # --------------------------------------------------------
         elif choice == "8":
-            if data is None:
-                print("Error: Load portfolio first (option 1).")
-                continue
-
-            plot_prices(data)
-
-        # --------------------------------------------------------
-        # 9) Exit
-        # --------------------------------------------------------
-        elif choice == "9":
             print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please select a number between 1 and 9.")
+            print("Invalid choice. Please select a number between 1 and 8.")
 
 
 if __name__ == "__main__":
