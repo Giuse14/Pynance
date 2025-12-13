@@ -59,46 +59,81 @@ def train_model(series):
 
 ##### Zukunft prediction
 
-def forecast_future_days(model, series, years, noise_factor=0.5):
+def forecast_future_days(model, series, years, noise_factor=1.0):
     days = years * 365
+    n_simulations = 5  # ← fest eingebaut, nichts anderes ändern
 
-    df = create_features(series)
-    last_row = df.iloc[-1].copy()
-    last_price = series.values[-1]
+    all_paths = []
 
-    predicted_prices = []
+    # Historische Statistik
+    historical_returns = series.pct_change().dropna()
+    historical_vol = historical_returns.std()
 
-    for _ in range(days):
-        X = last_row.drop(labels="price").values.reshape(1, -1)
-        predicted_return = model.predict(X)[0]
+    # Kein positiver Drift
+    target_drift = 0.0
 
-        # Realismus: Rauschen hinzufügen → kein perfekter Aufwärtstrend
-        predicted_return += np.random.normal(0, noise_factor * 0.0005)
+    # Crash: 1 alle ~3 Jahre
+    crash_probability = 1 / (3 * 365)
 
-        # Preis aktualisieren
-        last_price *= (1 + predicted_return)
-        predicted_prices.append(last_price)
+    for _ in range(n_simulations):
+        df = create_features(series)
+        last_row = df.iloc[-1].copy()
+        last_price = series.values[-1]
 
-        # Neue Features simulieren
-        new_row = {
-            "price": last_price,
-            "return": predicted_return,
-        }
+        predicted_prices = []
 
-        # einfaches Rolling-Update
-        for col in ["roll_mean_5", "roll_std_5",
-                    "roll_mean_20", "roll_std_20"]:
-            new_row[col] = last_row[col]  # leichte Näherung
+        for _ in range(days):
+            X = last_row.drop(labels="price").values.reshape(1, -1)
 
-        new_row["momentum_10"] = last_price / df["price"].iloc[-10]
-        new_row["momentum_20"] = last_price / df["price"].iloc[-20]
+            # Modell nur als schwaches Signal
+            model_signal = model.predict(X)[0]
+            predicted_return = 0.1 * model_signal + target_drift
 
-        df.loc[df.index[-1] + pd.Timedelta(days=1)] = new_row
+            # Volatilität dominiert
+            predicted_return += np.random.normal(
+                0,
+                last_row["roll_std_20"]
+                if not np.isnan(last_row["roll_std_20"])
+                else historical_vol
+            )
 
-        df = df.tail(200)  # Speicher Limit
-        last_row = df.iloc[-1]
+            # Crash-Event
+            if np.random.rand() < crash_probability:
+                predicted_return -= np.random.uniform(0.12, 0.25)
 
-    return predicted_prices
+            # Harte Begrenzung
+            predicted_return = np.clip(predicted_return, -0.35, 0.20)
+
+            # Preis aktualisieren
+            last_price *= (1 + predicted_return)
+            predicted_prices.append(last_price)
+
+            # Neue Features
+            new_row = {
+                "price": last_price,
+                "return": predicted_return,
+            }
+
+            df.loc[df.index[-1] + pd.Timedelta(days=1)] = new_row
+
+            df["roll_mean_5"] = df["return"].rolling(5).mean()
+            df["roll_std_5"] = df["return"].rolling(5).std()
+            df["roll_mean_20"] = df["return"].rolling(20).mean()
+            df["roll_std_20"] = df["return"].rolling(20).std()
+
+            df["momentum_10"] = df["price"] / df["price"].shift(10)
+            df["momentum_20"] = df["price"] / df["price"].shift(20)
+
+            df = df.tail(300)
+            last_row = df.iloc[-1]
+
+        all_paths.append(predicted_prices)
+
+    # 🔹 Durchschnittspfad berechnen
+    all_paths = np.array(all_paths)
+    avg_path = all_paths.mean(axis=0)
+
+    return avg_path.tolist()
 
 
 
