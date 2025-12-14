@@ -37,7 +37,7 @@ def main():
         print("8) Exit")
         print("========================================")
 
-        choice = input("Choose an option (1-9): ").strip()
+        choice = input("Choose an option (1-8): ").strip()
 
         ##### 1) Load portfolio
         if choice == "1":
@@ -133,7 +133,6 @@ def main():
 
             run_monte_carlo_simulation(price_df, weights)
             
-
 
         ##### 7) Run scenario
         #elif choice == "7":
