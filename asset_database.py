@@ -25,7 +25,7 @@ ASSET_DATABASE = {
     "VNQ": {"name": "Vanguard Real Estate ETF", "type": "Real Estate", "category": "Real Estate"},
     "IYR": {"name": "iShares U.S. Real Estate ETF", "type": "Real Estate", "category": "Real Estate"},
     
-    # Individual Stocks (examples)
+    # Individual Stocks
     "AAPL": {"name": "Apple Inc.", "type": "Technology", "category": "Equity"},
     "MSFT": {"name": "Microsoft Corporation", "type": "Technology", "category": "Equity"},
     "GOOGL": {"name": "Alphabet Inc.", "type": "Technology", "category": "Equity"},
@@ -42,45 +42,45 @@ PORTFOLIO_STRATEGIES = {
     "All Weather (Ray Dalio)": {
         "description": "Designed to perform well in all economic environments",
         "assets": {
-            "TLT": 0.40,    # Long-term bonds (perform well in deflation)
-            "SPY": 0.30,    # US stocks (perform well in growth)
-            "IEF": 0.15,    # Intermediate bonds (balance)
-            "GLD": 0.075,   # Gold (inflation hedge)
-            "DBC": 0.075,   # Commodities (inflation hedge)
+            "TLT": 0.40,
+            "SPY": 0.30,    
+            "IEF": 0.15,    
+            "GLD": 0.075,   
+            "DBC": 0.075,   
         }
     },
     "60/40 Portfolio": {
         "description": "Traditional balanced portfolio with 60% stocks, 40% bonds",
         "assets": {
-            "SPY": 0.60,    # US stocks
-            "AGG": 0.40,    # US bonds
+            "SPY": 0.60,
+            "AGG": 0.40,   
         }
     },
     "Permanent Portfolio": {
         "description": "Conservative portfolio designed for all economic conditions",
         "assets": {
-            "SPY": 0.25,    # Stocks (prosperity)
-            "TLT": 0.25,    # Long-term bonds (deflation)
-            "GLD": 0.25,    # Gold (inflation)
-            "SHY": 0.25,    # Short-term bonds (recession)
+            "SPY": 0.25,   
+            "TLT": 0.25,  
+            "GLD": 0.25,    
+            "SHY": 0.25,   
         }
     },
     "Three Fund Portfolio": {
         "description": "Simple diversified portfolio using three total market funds",
         "assets": {
-            "VTI": 0.50,    # Total US stock market
-            "VXUS": 0.30,   # Total international stock market
-            "BND": 0.20,    # Total bond market
+            "VTI": 0.50,    
+            "VXUS": 0.30,   
+            "BND": 0.20,    
         }
     },
     "Golden Butterfly": {
         "description": "Aggressive alternative to Permanent Portfolio with higher stock allocation",
         "assets": {
-            "SPY": 0.20,    # US stocks
-            "IWN": 0.20,    # Small cap value stocks
-            "TLT": 0.20,    # Long-term bonds
-            "SHY": 0.20,    # Short-term bonds
-            "GLD": 0.20,    # Gold
+            "SPY": 0.20, 
+            "IWN": 0.20,   
+            "TLT": 0.20,   
+            "SHY": 0.20,    
+            "GLD": 0.20,    
         }
     }
 }

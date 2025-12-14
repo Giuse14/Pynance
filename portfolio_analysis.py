@@ -1,4 +1,4 @@
-# portfolio_analysis.py (complete version)
+# portfolio_analysis.py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,11 +23,9 @@ def analyze_portfolio(data, weights, risk_free_rate=0.02):
     returns_df = pd.concat(all_returns, axis=1)
     returns_df.columns = tickers
     
-    # Portfolio returns (weighted)
     weights_array = np.array(weights)
     portfolio_returns = returns_df.dot(weights_array)
     
-    # Basic Statistics
     analysis_results['basic_stats'] = {
         'Total Return': (portfolio_returns + 1).prod() - 1,
         'Annualized Return': portfolio_returns.mean() * 252,
@@ -35,7 +33,6 @@ def analyze_portfolio(data, weights, risk_free_rate=0.02):
         'Cumulative Return': (1 + portfolio_returns).cumprod() - 1
     }
     
-    # Risk-Adjusted Returns
     analysis_results['risk_adjusted'] = {
         'Sharpe Ratio': (portfolio_returns.mean() * 252 - risk_free_rate) / 
                         (portfolio_returns.std() * np.sqrt(252)),
@@ -43,7 +40,6 @@ def analyze_portfolio(data, weights, risk_free_rate=0.02):
         'Calmar Ratio': calculate_calmar_ratio(portfolio_returns)
     }
     
-    # Risk Metrics
     analysis_results['risk_metrics'] = {
         'Max Drawdown': calculate_max_drawdown(portfolio_returns),
         'Value at Risk (95%)': calculate_var(portfolio_returns),
@@ -51,27 +47,23 @@ def analyze_portfolio(data, weights, risk_free_rate=0.02):
         'Beta': calculate_portfolio_beta(returns_df, weights_array)
     }
     
-    # Asset Allocation Analysis
     analysis_results['allocation'] = {
         'By Category': get_portfolio_allocation(tickers, weights),
         'Asset Details': {ticker: get_asset_info(ticker) for ticker in tickers}
     }
     
-    # Statistical Analysis
     analysis_results['statistical'] = {
         'Skewness': portfolio_returns.skew(),
         'Kurtosis': portfolio_returns.kurtosis(),
         'Jarque-Bera Test': stats.jarque_bera(portfolio_returns.dropna())[1]  # p-value
     }
     
-    # Diversification Analysis
     analysis_results['diversification'] = {
         'Portfolio Variance': calculate_portfolio_variance(returns_df, weights_array),
         'Diversification Ratio': calculate_diversification_ratio(returns_df, weights_array),
         'Correlation Matrix': returns_df.corr()
     }
     
-    # Component Analysis
     analysis_results['components'] = {
         'Individual Returns': returns_df.mean() * 252,
         'Individual Volatilities': returns_df.std() * np.sqrt(252),
@@ -81,7 +73,6 @@ def analyze_portfolio(data, weights, risk_free_rate=0.02):
     
     return analysis_results
 
-# ========== HELPER FUNCTION DEFINITIONS ==========
 
 def calculate_sortino_ratio(returns, risk_free_rate):
     """Calculate Sortino ratio (only downside risk)"""
@@ -117,11 +108,9 @@ def calculate_cvar(returns, confidence_level=0.05):
 def calculate_portfolio_beta(returns_df, weights):
     """Calculate portfolio beta relative to market (using SPY as proxy)"""
     try:
-        # If SPY is in the portfolio, use it as market proxy
         if 'SPY' in returns_df.columns:
             market_returns = returns_df['SPY']
         else:
-            # Use average of all assets as market proxy (simplification)
             market_returns = returns_df.mean(axis=1)
         
         portfolio_returns = returns_df.dot(weights)
@@ -158,7 +147,6 @@ def generate_analysis_report(analysis_results, tickers, weights):
     """Generate a comprehensive text report of the analysis"""
     report = []
     
-    # Basic Stats
     basic = analysis_results['basic_stats']
     report.append("=" * 60)
     report.append("PORTFOLIO ANALYSIS REPORT")
@@ -167,20 +155,17 @@ def generate_analysis_report(analysis_results, tickers, weights):
     report.append(f"Annualized Return: {basic['Annualized Return']:.2%}")
     report.append(f"Annualized Volatility: {basic['Annualized Volatility']:.2%}")
     
-    # Asset Allocation
     allocation = analysis_results['allocation']['By Category']
     report.append("\n--- ASSET ALLOCATION ---")
     for category, weight in sorted(allocation.items(), key=lambda x: x[1], reverse=True):
         report.append(f"{category}: {weight:.1%}")
     
-    # Risk-Adjusted Returns
     risk_adj = analysis_results['risk_adjusted']
     report.append("\n--- RISK-ADJUSTED RETURNS ---")
     report.append(f"Sharpe Ratio: {risk_adj['Sharpe Ratio']:.2f}")
     report.append(f"Sortino Ratio: {risk_adj['Sortino Ratio']:.2f}")
     report.append(f"Calmar Ratio: {risk_adj['Calmar Ratio']:.2f}")
     
-    # Risk Metrics
     risk = analysis_results['risk_metrics']
     report.append("\n--- RISK METRICS ---")
     report.append(f"Max Drawdown: {risk['Max Drawdown']:.2%}")
@@ -188,20 +173,17 @@ def generate_analysis_report(analysis_results, tickers, weights):
     report.append(f"Conditional VaR (95%): {risk['Conditional VaR (95%)']:.2%}")
     report.append(f"Portfolio Beta: {risk['Beta']:.2f}")
     
-    # Statistical Analysis
     stats = analysis_results['statistical']
     report.append("\n--- STATISTICAL ANALYSIS ---")
     report.append(f"Skewness: {stats['Skewness']:.2f}")
     report.append(f"Kurtosis: {stats['Kurtosis']:.2f}")
     report.append(f"Normality (Jarque-Bera p-value): {stats['Jarque-Bera Test']:.3f}")
     
-    # Diversification
     divers = analysis_results['diversification']
     report.append("\n--- DIVERSIFICATION ---")
     report.append(f"Portfolio Variance: {divers['Portfolio Variance']:.6f}")
     report.append(f"Diversification Ratio: {divers['Diversification Ratio']:.2f}")
     
-    # Component Analysis
     report.append("\n--- COMPONENT ANALYSIS ---")
     for i, ticker in enumerate(tickers):
         asset_info = analysis_results['allocation']['Asset Details'][ticker]
@@ -209,7 +191,7 @@ def generate_analysis_report(analysis_results, tickers, weights):
                      f"Return: {analysis_results['components']['Individual Returns'][ticker]:.2%} | "
                      f"Vol: {analysis_results['components']['Individual Volatilities'][ticker]:.2%}")
     
-    ###### CSV EXPORT
+    ##### CSV EXPORT
 
     csv_rows = []
     individual_returns = analysis_results['components']['Individual Returns']
@@ -238,13 +220,11 @@ def plot_asset_allocation(analysis_results, tickers, weights):
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     
-    # Pie chart by category
     colors = plt.cm.Set3(np.linspace(0, 1, len(allocation)))
     wedges, texts, autotexts = ax1.pie(allocation.values(), labels=allocation.keys(), 
                                       autopct='%1.1f%%', colors=colors, startangle=90)
     ax1.set_title('Asset Allocation by Category', fontweight='bold')
     
-    # Bar chart by individual assets
     asset_types = {}
     for i, ticker in enumerate(tickers):
         asset_info = analysis_results['allocation']['Asset Details'][ticker]

@@ -8,7 +8,6 @@ def get_user_portfolio():
     if len(tickers) != len(weights):
         raise ValueError("Number of weights must match number of tickers.")
 
-    # Normalize weights to sum to 1
     total = sum(weights)
     weights = [w / total for w in weights]
 

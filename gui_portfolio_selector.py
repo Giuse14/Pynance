@@ -9,7 +9,6 @@ class PortfolioSelectorGUI:
         self.root.title("Portfolio Selector")
         self.root.geometry("900x600")
         
-        # Configure style for better appearance
         self.style = ttk.Style()
         self.style.configure('TButton', padding=5, font=('Arial', 10))
         self.style.configure('TLabel', font=('Arial', 10))
@@ -21,42 +20,38 @@ class PortfolioSelectorGUI:
         # Predefined portfolios
         self.predefined_portfolios = {
             "All Weather (Ray Dalio)": {
-                "TLT": 0.40,    # Long-term bonds
-                "SPY": 0.30,    # US stocks
-                "IEF": 0.15,    # Intermediate bonds
-                "GLD": 0.075,   # Gold
-                "DBC": 0.075,   # Commodities
+                "TLT": 0.40,    
+                "SPY": 0.30,    
+                "IEF": 0.15,    
+                "GLD": 0.075,   
+                "DBC": 0.075,  
             },
             "60/40 Portfolio": {
-                "SPY": 0.60,    # US stocks
-                "AGG": 0.40,    # US bonds
+                "SPY": 0.60,    
+                "AGG": 0.40,    
             },
             "Permanent Portfolio": {
-                "SPY": 0.25,    # Stocks
-                "TLT": 0.25,    # Long-term bonds
-                "GLD": 0.25,    # Gold
-                "SHY": 0.25,    # Short-term bonds
+                "SPY": 0.25, 
+                "TLT": 0.25,    
+                "GLD": 0.25,    
+                "SHY": 0.25,    
             },
             "Three Fund Portfolio": {
-                "VTI": 0.50,    # Total US stock market
-                "VXUS": 0.30,   # International stocks
-                "BND": 0.20,    # Total bond market
+                "VTI": 0.50,    
+                "VXUS": 0.30,   
+                "BND": 0.20,    
             }
         }
 
-        # Create main frames for horizontal layout
         main_container = ttk.Frame(self.root, padding="10")
         main_container.pack(fill=tk.BOTH, expand=True)
 
-        # Left frame for search and results
         left_frame = ttk.LabelFrame(main_container, text="Ticker Selection", padding="10")
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
 
-        # Right frame for portfolio
         right_frame = ttk.LabelFrame(main_container, text="Your Portfolio", padding="10")
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(5, 0))
 
-        # ------ Predefined Portfolios Section ------
         predefined_frame = ttk.LabelFrame(left_frame, text="Predefined Portfolios", padding="10")
         predefined_frame.pack(fill=tk.X, pady=(0, 10))
 
@@ -71,8 +66,7 @@ class PortfolioSelectorGUI:
         
         ttk.Button(predefined_frame, text="Load Portfolio", 
                   command=self.load_predefined_portfolio).pack(side=tk.LEFT)
-
-        # ------ Search Section ------
+        
         search_frame = ttk.Frame(left_frame)
         search_frame.pack(fill=tk.X, pady=(0, 10))
 
@@ -83,24 +77,21 @@ class PortfolioSelectorGUI:
         
         ttk.Button(search_frame, text="Search", command=self.search_ticker).pack(side=tk.LEFT, padx=(0, 10))
         
-        # Add popular ticker buttons for quick access (including bonds)
         quick_frame = ttk.Frame(left_frame)
         quick_frame.pack(fill=tk.X, pady=(0, 10))
         
         ttk.Label(quick_frame, text="Quick add:").pack(side=tk.LEFT, padx=(0, 5))
         
-        # Popular tickers including stocks and bonds
         popular_tickers = [
-            'AAPL', 'MSFT', 'SPY', 'QQQ',  # Stocks and ETFs
-            'TLT', 'AGG', 'BND', 'IEF',    # Bonds
-            'GLD', 'SLV', 'DBC'            # Commodities
+            'AAPL', 'MSFT', 'SPY', 'QQQ',  
+            'TLT', 'AGG', 'BND', 'IEF',   
+            'GLD', 'SLV', 'DBC'            
         ]
         for ticker in popular_tickers:
             btn = ttk.Button(quick_frame, text=ticker, width=5, 
                            command=lambda t=ticker: self.quick_add_ticker(t))
             btn.pack(side=tk.LEFT, padx=2)
 
-        # ------ Search Results ------
         results_frame = ttk.Frame(left_frame)
         results_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
@@ -111,16 +102,13 @@ class PortfolioSelectorGUI:
         results_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.results_list.config(yscrollcommand=results_scrollbar.set)
         
-        # Double-click to add from search results
         self.results_list.bind('<Double-Button-1>', lambda e: self.add_ticker())
 
-        # Add button frame
         add_button_frame = ttk.Frame(left_frame)
         add_button_frame.pack(fill=tk.X)
         
         ttk.Button(add_button_frame, text="Add Selected Ticker", command=self.add_ticker).pack(pady=5)
 
-        # ------ Portfolio List ------
         portfolio_list_frame = ttk.Frame(right_frame)
         portfolio_list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
@@ -131,7 +119,6 @@ class PortfolioSelectorGUI:
         portfolio_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.portfolio_list.config(yscrollcommand=portfolio_scrollbar.set)
 
-        # ------ Weight Entry ------
         weight_frame = ttk.Frame(right_frame)
         weight_frame.pack(fill=tk.X, pady=(0, 10))
 
@@ -143,7 +130,6 @@ class PortfolioSelectorGUI:
         ttk.Button(weight_frame, text="Set Weight", command=self.set_weight).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(weight_frame, text="Auto Balance", command=self.auto_balance).pack(side=tk.LEFT)
 
-        # ------ Control Buttons ------
         control_frame = ttk.Frame(right_frame)
         control_frame.pack(fill=tk.X)
 
@@ -151,7 +137,6 @@ class PortfolioSelectorGUI:
         ttk.Button(control_frame, text="Clear All", command=self.clear_portfolio).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(control_frame, text="Confirm Portfolio", command=self.confirm).pack(side=tk.RIGHT)
 
-        # Add some helpful tips
         tips_frame = ttk.Frame(left_frame)
         tips_frame.pack(fill=tk.X, pady=(10, 0))
         
@@ -159,7 +144,6 @@ class PortfolioSelectorGUI:
         tip_label = ttk.Label(tips_frame, text=tips_text, font=('Arial', 9), foreground='gray', wraplength=400)
         tip_label.pack()
 
-        # Asset type info
         asset_info_frame = ttk.Frame(right_frame)
         asset_info_frame.pack(fill=tk.X, pady=(10, 0))
         
@@ -167,14 +151,12 @@ class PortfolioSelectorGUI:
         asset_label = ttk.Label(asset_info_frame, text=asset_info, font=('Arial', 9), foreground='blue', wraplength=400)
         asset_label.pack()
 
-        # To block program until user closes
         self.root.mainloop()
 
     def on_portfolio_select(self, event):
         """When a predefined portfolio is selected from dropdown"""
         portfolio_name = self.portfolio_var.get()
         if portfolio_name:
-            # Show portfolio composition
             portfolio = self.predefined_portfolios[portfolio_name]
             composition_text = f"{portfolio_name}:\n"
             for ticker, weight in portfolio.items():
@@ -190,12 +172,10 @@ class PortfolioSelectorGUI:
         if self.selected_tickers and not messagebox.askyesno("Confirm", "This will replace your current portfolio. Continue?"):
             return
 
-        # Clear current portfolio
         self.portfolio_list.delete(0, tk.END)
         self.selected_tickers.clear()
         self.selected_weights.clear()
 
-        # Load predefined portfolio
         portfolio = self.predefined_portfolios[portfolio_name]
         for ticker, weight in portfolio.items():
             self.selected_tickers.append(ticker)
@@ -213,7 +193,6 @@ class PortfolioSelectorGUI:
         equal_weight = 1.0 / len(self.selected_tickers)
         self.selected_weights = [equal_weight] * len(self.selected_tickers)
         
-        # Update display
         self.portfolio_list.delete(0, tk.END)
         for i, ticker in enumerate(self.selected_tickers):
             self.portfolio_list.insert(tk.END, f"{ticker} — weight: {equal_weight:.1%}")
@@ -225,7 +204,6 @@ class PortfolioSelectorGUI:
         self.search_entry.delete(0, tk.END)
         self.search_entry.insert(0, ticker)
         self.search_ticker()
-        # Auto-add after a brief delay to allow search to complete
         self.root.after(100, self.add_ticker)
 
     def search_ticker(self):
@@ -237,7 +215,6 @@ class PortfolioSelectorGUI:
         try:
             ticker = yf.Ticker(query)
             info = ticker.info
-            # If "longName" exists, it's a valid ticker
             name = info.get("longName", "Unknown Company")
             sector = info.get("sector", "N/A")
             current_price = info.get("currentPrice", info.get("regularMarketPrice", "N/A"))
@@ -255,7 +232,7 @@ class PortfolioSelectorGUI:
             messagebox.showerror("Error", f"Ticker '{query}' not found or error: {str(e)}")
 
     def add_ticker(self):
-        selection = self.results_list.get(0)  # Get first item which should be the ticker line
+        selection = self.results_list.get(0)
         if selection and "—" in selection:
             ticker = selection.split("—")[0].strip()
             if ticker in self.selected_tickers:
@@ -301,7 +278,6 @@ class PortfolioSelectorGUI:
             messagebox.showerror("Error", "Weight must be a number.")
             return
 
-        # Set weight for selected ticker or last ticker
         selection = self.portfolio_list.curselection()
         if selection:
             idx = selection[0]
@@ -328,10 +304,8 @@ class PortfolioSelectorGUI:
             messagebox.showerror("Error", "Total weight must be positive.")
             return
             
-        # Normalize weights to sum to 1
         self.selected_weights = [w / total for w in self.selected_weights]
 
-        # Show confirmation
         portfolio_summary = "Portfolio confirmed:\n"
         for i, (ticker, weight) in enumerate(zip(self.selected_tickers, self.selected_weights)):
             portfolio_summary += f"{ticker}: {weight:.2%}\n"

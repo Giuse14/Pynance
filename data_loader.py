@@ -15,13 +15,11 @@ def load_data(tickers, period="10y"):
     
     for t in tickers:
         try:
-            # Download data
             df = yf.download(t, period=period, auto_adjust=True)
             if df.empty:
                 print(f"No data found for {t}")
                 continue
                 
-            # Keep only necessary columns
             df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
             data[t] = df
             
