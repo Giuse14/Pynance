@@ -179,7 +179,6 @@ class PortfolioSelectorGUI:
             composition_text = f"{portfolio_name}:\n"
             for ticker, weight in portfolio.items():
                 composition_text += f"  {ticker}: {weight:.1%}\n"
-            messagebox.showinfo("Portfolio Composition", composition_text)
 
     def load_predefined_portfolio(self):
         """Load the selected predefined portfolio"""
