@@ -111,17 +111,15 @@ def main():
             plot_drawdown(data, weights)
 
         # --------------------------------------------------------
-        # 5) Train & Forecast model  (NEUE VERSION)
+        # 5) Train & Forecast model
         # --------------------------------------------------------
         elif choice == "5":
             if portfolio_series is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
 
-            # Modell trainieren (aus neuer prediction.py)
             model, X_test, y_test = train_model(portfolio_series)
 
-            # Benutzer nach Prognosezeitraum fragen
             try:
                 years_to_predict = int(input("Wie viele Jahre sollen prognostiziert werden? "))
                 if years_to_predict <= 0:
@@ -131,10 +129,8 @@ def main():
                 print("Invalid input. Please enter a positive integer.")
                 continue
 
-            # Zukunft prognostizieren
             future_predictions = forecast_future_days(model, portfolio_series, years_to_predict)
 
-            # Neues Plot mit Jahresachse + Zukunft aus prediction.py
             plot_with_predictions(portfolio_series, future_predictions, years_to_predict)
 
         # --------------------------------------------------------

@@ -61,18 +61,15 @@ def train_model(series):
 
 def forecast_future_days(model, series, years, noise_factor=1.0):
     days = years * 365
-    n_simulations = 5  # ← fest eingebaut, nichts anderes ändern
+    n_simulations = 5
 
     all_paths = []
 
-    # Historische Statistik
     historical_returns = series.pct_change().dropna()
     historical_vol = historical_returns.std()
 
-    # Kein positiver Drift
     target_drift = 0.0
 
-    # Crash: 1 alle ~3 Jahre
     crash_probability = 1 / (3 * 365)
 
     for _ in range(n_simulations):
@@ -85,11 +82,9 @@ def forecast_future_days(model, series, years, noise_factor=1.0):
         for _ in range(days):
             X = last_row.drop(labels="price").values.reshape(1, -1)
 
-            # Modell nur als schwaches Signal
             model_signal = model.predict(X)[0]
             predicted_return = 0.1 * model_signal + target_drift
 
-            # Volatilität dominiert
             predicted_return += np.random.normal(
                 0,
                 last_row["roll_std_20"]
@@ -97,18 +92,14 @@ def forecast_future_days(model, series, years, noise_factor=1.0):
                 else historical_vol
             )
 
-            # Crash-Event
             if np.random.rand() < crash_probability:
                 predicted_return -= np.random.uniform(0.12, 0.25)
 
-            # Harte Begrenzung
             predicted_return = np.clip(predicted_return, -0.35, 0.20)
 
-            # Preis aktualisieren
             last_price *= (1 + predicted_return)
             predicted_prices.append(last_price)
 
-            # Neue Features
             new_row = {
                 "price": last_price,
                 "return": predicted_return,
@@ -129,7 +120,6 @@ def forecast_future_days(model, series, years, noise_factor=1.0):
 
         all_paths.append(predicted_prices)
 
-    # 🔹 Durchschnittspfad berechnen
     all_paths = np.array(all_paths)
     avg_path = all_paths.mean(axis=0)
 
@@ -154,7 +144,6 @@ def plot_with_predictions(series, predictions, years):
     plt.plot(series.index, series.values, label="Historische Daten")
     plt.plot(pred_series.index, pred_series.values, label="Vorhersage", alpha=0.8)
 
-    # X-Achse formattieren → nur Jahreszahlen anzeigen
     plt.gca().xaxis.set_major_formatter(
         plt.matplotlib.dates.DateFormatter('%Y')
     )
