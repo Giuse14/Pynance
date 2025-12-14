@@ -4,7 +4,6 @@ import pandas as pd
 from matplotlib.gridspec import GridSpec
 
 # def plot_prices(data):
-#     """Zeigt Kursverläufe aller Aktien."""
 #     plt.figure(figsize=(12, 6))
 #     for t, df in data.items():
 #         plt.plot(df["Close"], label=t)
@@ -17,7 +16,6 @@ from matplotlib.gridspec import GridSpec
 #     plt.show()
 
 def plot_prediction(y_test, pred):
-    """Zeigt echte vs vorhergesagte Preise."""
     plt.figure(figsize=(12, 6))
     plt.plot(y_test, label="Echt")
     plt.plot(pred, label="Vorhersage")
@@ -30,7 +28,6 @@ def plot_prediction(y_test, pred):
     plt.show()
 
 def plot_scenario(scenario):
-    """Zeigt simulierte Szenarien."""
     plt.figure(figsize=(12, 6))
     for t, df in scenario.items():
         plt.plot(df["Close"], label=f"{t} (Szenario)")
@@ -43,20 +40,18 @@ def plot_scenario(scenario):
     plt.show()
 
 def plot_portfolio_analysis(analysis_results, tickers, weights):
-    """Comprehensive portfolio analysis visualization"""
     
-    # Create a figure with multiple subplots
     fig = plt.figure(figsize=(16, 12))
     gs = GridSpec(3, 3, figure=fig)
     
-    # 1. Portfolio Composition (Pie Chart)
+    # 1. Portfolio Composition
     ax1 = fig.add_subplot(gs[0, 0])
     colors = plt.cm.Set3(np.linspace(0, 1, len(tickers)))
     wedges, texts, autotexts = ax1.pie(weights, labels=tickers, autopct='%1.1f%%', 
                                       colors=colors, startangle=90)
     ax1.set_title('Portfolio Composition', fontweight='bold')
     
-    # 2. Risk-Return Scatter (Individual Assets)
+    # 2. Risk-Return Scatter
     ax2 = fig.add_subplot(gs[0, 1])
     individual_returns = analysis_results['components']['Individual Returns']
     individual_volatilities = analysis_results['components']['Individual Volatilities']
@@ -67,7 +62,6 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
         ax2.annotate(ticker, (individual_volatilities[ticker], individual_returns[ticker]),
                     xytext=(5, 5), textcoords='offset points', fontsize=9)
     
-    # Add portfolio point
     port_return = analysis_results['basic_stats']['Annualized Return']
     port_vol = analysis_results['basic_stats']['Annualized Volatility']
     ax2.scatter(port_vol, port_return, s=200, marker='*', color='red', 
@@ -81,7 +75,7 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     ax2.grid(True, alpha=0.3)
     ax2.legend()
     
-    # 3. Performance Metrics (Bar Chart)
+    # 3. Performance Metrics
     ax3 = fig.add_subplot(gs[0, 2])
     metrics = ['Sharpe Ratio', 'Sortino Ratio']
     values = [analysis_results['risk_adjusted']['Sharpe Ratio'], 
@@ -91,14 +85,13 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     ax3.set_ylabel('Ratio')
     ax3.set_title('Risk-Adjusted Returns', fontweight='bold')
     ax3.grid(True, alpha=0.3, axis='y')
-    
-    # Add value labels on bars
+
     for bar, value in zip(bars, values):
         height = bar.get_height()
         ax3.text(bar.get_x() + bar.get_width()/2., height,
                 f'{value:.2f}', ha='center', va='bottom')
     
-    # 4. Risk Metrics (Bar Chart)
+    # 4. Risk Metrics
     ax4 = fig.add_subplot(gs[1, 0])
     risk_metrics = ['Max Drawdown', 'VaR (95%)', 'CVaR (95%)']
     risk_values = [
@@ -112,7 +105,6 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     ax4.set_title('Risk Metrics', fontweight='bold')
     ax4.grid(True, alpha=0.3, axis='y')
     
-    # Add value labels
     for bar, value in zip(risk_bars, risk_values):
         height = bar.get_height()
         ax4.text(bar.get_x() + bar.get_width()/2., height,
@@ -123,13 +115,12 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     corr_matrix = analysis_results['diversification']['Correlation Matrix']
     im = ax5.imshow(corr_matrix, cmap='coolwarm', vmin=-1, vmax=1, aspect='auto')
     
-    # Set ticks and labels
     ax5.set_xticks(range(len(tickers)))
     ax5.set_yticks(range(len(tickers)))
     ax5.set_xticklabels(tickers, rotation=45)
     ax5.set_yticklabels(tickers)
     
-    # Add correlation values as text
+
     for i in range(len(tickers)):
         for j in range(len(tickers)):
             ax5.text(j, i, f'{corr_matrix.iloc[i, j]:.2f}', 
@@ -161,7 +152,7 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     # 7. Statistical Distribution Analysis
     ax7 = fig.add_subplot(gs[2, :])
     
-    # Create some sample return data for distribution (in a real scenario, you'd use actual returns)
+
     sample_returns = np.random.normal(analysis_results['basic_stats']['Annualized Return'], 
                                      analysis_results['basic_stats']['Annualized Volatility'], 
                                      1000)
@@ -169,7 +160,6 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     ax7.hist(sample_returns, bins=50, density=True, alpha=0.7, color='lightgray', 
              label='Return Distribution')
     
-    # Add vertical lines for key metrics
     ax7.axvline(analysis_results['basic_stats']['Annualized Return'], 
                 color='red', linestyle='--', linewidth=2, label='Mean Return')
     ax7.axvline(analysis_results['risk_metrics']['Value at Risk (95%)'], 
@@ -181,7 +171,6 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     ax7.legend()
     ax7.grid(True, alpha=0.3)
     
-    # Add some key statistics as text
     stats_text = f"Skewness: {analysis_results['statistical']['Skewness']:.2f}\n"
     stats_text += f"Kurtosis: {analysis_results['statistical']['Kurtosis']:.2f}\n"
     stats_text += f"Diversification Ratio: {analysis_results['diversification']['Diversification Ratio']:.2f}"
@@ -193,7 +182,6 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     plt.show()
 
 # def plot_returns_over_time(data, weights):
-#     """Plot cumulative returns over time for portfolio and individual assets"""
 #     plt.figure(figsize=(12, 8))
     
 #     # Calculate cumulative returns for each asset
@@ -226,10 +214,8 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
 #     plt.show()
 
 def plot_drawdown(data, weights):
-    """Plot portfolio drawdown over time"""
     plt.figure(figsize=(12, 6))
     
-    # Calculate portfolio returns
     all_returns = []
     for df in data.values():
         ret = df["Close"].pct_change().dropna()
@@ -254,42 +240,29 @@ def plot_drawdown(data, weights):
     plt.show()
 
 def interactive_toggle_plot(data, weights=None):
-    """Interactive toggle between PRICE mode and RETURN mode.
-       FIXED: Portfolio PRICE is shown in price mode (non-normalized).
-    """
 
     fig, ax = plt.subplots(figsize=(12, 6))
     mode = "price"
 
-    # Build DataFrame of asset prices
     price_df = pd.concat([df["Close"] for df in data.values()], axis=1)
     price_df.columns = data.keys()
 
-    # Daily returns
     returns_df = price_df.pct_change().dropna()
 
-    # --- PORTFOLIO PRICE (REAL, NOT NORMALIZED) ---
     if weights is not None:
         weights = np.array(weights)
 
-        # Weighted portfolio value:
         # portfolio_price[t] = sum_i( weight_i * price_i[t] )
         portfolio_price = price_df.mul(weights, axis=1).sum(axis=1)
 
-        # Portfolio returns (needed only for the return plot)
         portfolio_returns = returns_df.dot(weights)
 
-    # ------------------------------------------------------------
-    # PRICE PLOT (real prices, non-normalized)
-    # ------------------------------------------------------------
     def plot_price():
         ax.clear()
 
-        # Plot asset prices
         for ticker in price_df.columns:
             ax.plot(price_df.index, price_df[ticker], label=ticker)
 
-        # Plot real portfolio price
         if weights is not None:
             ax.plot(portfolio_price.index,
                     portfolio_price.values,
@@ -304,18 +277,13 @@ def interactive_toggle_plot(data, weights=None):
         ax.legend()
         fig.canvas.draw_idle()
 
-    # ------------------------------------------------------------
-    # RETURN PLOT (cumulative returns)
-    # ------------------------------------------------------------
     def plot_return():
         ax.clear()
 
-        # Plot each asset's cumulative return
         for ticker in returns_df.columns:
             cum = (1 + returns_df[ticker]).cumprod() - 1
             ax.plot(cum.index, cum.values, label=ticker)
 
-        # Plot portfolio cumulative returns
         if weights is not None:
             cum_port = (1 + portfolio_returns).cumprod() - 1
             ax.plot(cum_port.index,
@@ -331,14 +299,8 @@ def interactive_toggle_plot(data, weights=None):
         ax.legend()
         fig.canvas.draw_idle()
 
-    # ------------------------------------------------------------
-    # INITIAL PLOT
-    # ------------------------------------------------------------
     plot_price()
 
-    # ------------------------------------------------------------
-    # KEYBOARD EVENT
-    # ------------------------------------------------------------
     def on_key(event):
         nonlocal mode
         if event.key == "h":

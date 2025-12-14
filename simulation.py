@@ -1,3 +1,4 @@
+##### VERALTET. NICTH IMPLEMENTIERT
 import pandas as pd
 
 def run_scenario(data, scenario_type="AI_BUBBLE"):
@@ -8,11 +9,11 @@ def run_scenario(data, scenario_type="AI_BUBBLE"):
         sim = df.copy()
 
         if scenario_type == "AI_BUBBLE":
-            sim["Close"] = sim["Close"] * 1.15  # +15%
+            sim["Close"] = sim["Close"] * 1.15
         elif scenario_type == "CRASH":
-            sim["Close"] = sim["Close"] * 0.85  # -15%
+            sim["Close"] = sim["Close"] * 0.85
         elif scenario_type == "RECOVERY":
-            sim["Close"] = sim["Close"] * 1.05  # +5%
+            sim["Close"] = sim["Close"] * 1.05
 
         scenario[t] = sim
 
