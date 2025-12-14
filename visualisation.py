@@ -162,7 +162,6 @@ def plot_portfolio_analysis(analysis_results, tickers, weights):
     ax7 = fig.add_subplot(gs[2, :])
     
     # Create some sample return data for distribution (in a real scenario, you'd use actual returns)
-    # This is a placeholder - you might want to pass actual returns data
     sample_returns = np.random.normal(analysis_results['basic_stats']['Annualized Return'], 
                                      analysis_results['basic_stats']['Annualized Volatility'], 
                                      1000)

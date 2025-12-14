@@ -22,7 +22,7 @@ def main():
     y_test = None
     pred = None
     scenario = None
-    current_period = "10y"  # Default period
+    current_period = "10y"
 
     while True:
         print("\n========== PORTFOLIO MANAGER ==========")
@@ -39,9 +39,7 @@ def main():
 
         choice = input("Choose an option (1-9): ").strip()
 
-        # --------------------------------------------------------
-        # 1) Load portfolio
-        # --------------------------------------------------------
+        ##### 1) Load portfolio
         if choice == "1":
             tickers, weights = select_portfolio_gui()
             data = load_data(tickers, period=current_period)
@@ -49,15 +47,12 @@ def main():
             print(f"\nPortfolio successfully loaded: {tickers}")
             print(f"Data period: {current_period}")
 
-        # --------------------------------------------------------
-        # 2) Analyze portfolio (Text Report)
-        # --------------------------------------------------------
+        ##### 2) Analyze portfolio
         elif choice == "2":
             if portfolio_series is None or data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
 
-            # Allow user to select analysis period
             print("\nSelect analysis period:")
             print("1) 5 years (5y)")
             print("2) 10 years (10y) - Recommended")
@@ -89,9 +84,7 @@ def main():
             report = generate_analysis_report(analysis, tickers, weights)
             print(report)
 
-        # --------------------------------------------------------
-        # 3) Visualize portfolio analysis
-        # --------------------------------------------------------
+        ##### 3) Visualize portfolio analysis
         elif choice == "3":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
@@ -100,9 +93,7 @@ def main():
             analysis = analyze_portfolio(data, weights)
             plot_portfolio_analysis(analysis, tickers, weights)
 
-        # --------------------------------------------------------
-        # 4) Plot drawdown analysis
-        # --------------------------------------------------------
+        ##### 4) Plot drawdown analysis
         elif choice == "4":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
@@ -110,9 +101,7 @@ def main():
 
             plot_drawdown(data, weights)
 
-        # --------------------------------------------------------
-        # 5) Train & Forecast model
-        # --------------------------------------------------------
+        ##### 5) Train & Forecast model
         elif choice == "5":
             if portfolio_series is None:
                 print("Error: Load portfolio first (option 1).")
@@ -133,15 +122,12 @@ def main():
 
             plot_with_predictions(portfolio_series, future_predictions, years_to_predict)
 
-        # --------------------------------------------------------
-        # 6) Run scenario
-        # --------------------------------------------------------
+        ##### 6) Run Monte Carlo
         elif choice == "6":
             if data is None:
                 print("Error: Load portfolio first (option 1).")
                 continue
 
-            # Build price DataFrame for MC
             price_df = pd.concat([data[t]["Close"] for t in tickers], axis=1)
             price_df.columns = tickers
 
@@ -149,9 +135,7 @@ def main():
             
 
 
-        # --------------------------------------------------------
-        # 7) Run scenario
-        # --------------------------------------------------------
+        ##### 7) Run scenario
         #elif choice == "7":
             #if data is None:
                 #print("Error: Load portfolio first (option 1).")
@@ -172,9 +156,7 @@ def main():
             #scenario = run_scenario(data, scenario_type=scenario_map[s_choice])
             #plot_scenario(scenario)
 
-        # --------------------------------------------------------
-        # 8) Plot historical prices
-        # --------------------------------------------------------
+        ##### 8) Plot historical prices
         elif choice == "7":
             if data is None:
                 print("Load portfolio first.")
@@ -182,9 +164,7 @@ def main():
             interactive_toggle_plot(data, weights)
 
 
-        # --------------------------------------------------------
-        # 9) Exit
-        # --------------------------------------------------------
+        ##### 9) Exit
         elif choice == "8":
             print("Goodbye!")
             break
