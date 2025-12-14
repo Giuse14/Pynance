@@ -32,9 +32,9 @@ def main():
         print("4) Plot drawdown analysis")
         print("5) Train & Forecast model")
         print("6) Monte Carlo Simulation")
-        print("7) Run scenario analysis")
-        print("8) Plot price history")
-        print("9) Exit")
+        #print("7) Run scenario analysis")
+        print("7) Plot price history")
+        print("8) Exit")
         print("========================================")
 
         choice = input("Choose an option (1-9): ").strip()
@@ -156,30 +156,30 @@ def main():
         # --------------------------------------------------------
         # 7) Run scenario
         # --------------------------------------------------------
-        elif choice == "7":
-            if data is None:
-                print("Error: Load portfolio first (option 1).")
-                continue
+        #elif choice == "7":
+            #if data is None:
+                #print("Error: Load portfolio first (option 1).")
+                #continue
 
-            print("\nChoose scenario:")
-            print("1) AI Bubble (+15%)")
-            print("2) Crash (-15%)")
-            print("3) Recovery (+5%)")
-            s_choice = input("Scenario option: ").strip()
+            #print("\nChoose scenario:")
+            #print("1) AI Bubble (+15%)")
+            #print("2) Crash (-15%)")
+            #print("3) Recovery (+5%)")
+            #s_choice = input("Scenario option: ").strip()
 
-            scenario_map = {"1": "AI_BUBBLE", "2": "CRASH", "3": "RECOVERY"}
+            #scenario_map = {"1": "AI_BUBBLE", "2": "CRASH", "3": "RECOVERY"}
 
-            if s_choice not in scenario_map:
-                print("Invalid scenario.")
-                continue
+            #if s_choice not in scenario_map:
+                #print("Invalid scenario.")
+                #continue
 
-            scenario = run_scenario(data, scenario_type=scenario_map[s_choice])
-            plot_scenario(scenario)
+            #scenario = run_scenario(data, scenario_type=scenario_map[s_choice])
+            #plot_scenario(scenario)
 
         # --------------------------------------------------------
         # 8) Plot historical prices
         # --------------------------------------------------------
-        elif choice == "8":
+        elif choice == "7":
             if data is None:
                 print("Load portfolio first.")
                 continue
@@ -189,7 +189,7 @@ def main():
         # --------------------------------------------------------
         # 9) Exit
         # --------------------------------------------------------
-        elif choice == "9":
+        elif choice == "8":
             print("Goodbye!")
             break
 
